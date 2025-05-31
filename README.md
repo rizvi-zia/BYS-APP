@@ -6,7 +6,7 @@ This is a Streamlit-based dashboard for analyzing training program data. It incl
 
 ## 🔧 Features
 
-- 🔐 **Login System** for multiple users (admin, user1, etc.)
+- 🔐 **Login System** for multiple users (user, user2, etc.)
 - 📁 **Project Dashboard** — Analyze SPOC-wise, project-wise, and batch type data
 - 📌 **Active Batches Dashboard** — Filter active batches by SPOC, project, and course
 - 💰 **SPOC Payout** — Calculate and display payouts based on certifications
