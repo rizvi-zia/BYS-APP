@@ -16,7 +16,7 @@ This is a Streamlit-based dashboard for analyzing training program data. It incl
 ## 📁 Files Included
 
 - `bys_dashboard.py` – Main Streamlit app script
-- `Master Data for App_updated.csv.xlsx` – Source Excel file with batch and SPOC data
+- `master_data.xlsx` – Source Excel file with batch and SPOC data
 - `requirements.txt` – Python package requirements
 
 ---
@@ -41,8 +41,8 @@ streamlit run bys_dashboard.py
 
 | Username | Password   |
 |----------|------------|
-| admin    | admin123   |
-| user1    | password1  |
+| user    | password   |
+| user2    | password2  |
 
 ---
 
