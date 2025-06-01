@@ -156,6 +156,3 @@ if not st.session_state.logged_in:
             st.metric("Total Payout Amount (₹)", int(payout_summary["Payout Amount"].sum()))
             st.metric("Total Payment Done (₹)", int(payout_summary["Payment Amount"].sum()))
             st.metric("Total Remaining Amount (₹)", int(payout_summary["Remaining Amount"].sum()))
-    else:
-        st.warning("Please upload a valid Excel (.xlsx) file to continue.")
-        st.stop()
