@@ -16,7 +16,7 @@ This is a Streamlit-based dashboard for analyzing training program data. It incl
 ## 📁 Files Included
 
 - `bys_dashboard.py` – Main Streamlit app script
-- `master_data.xlsx` – Source Excel file with batch and SPOC data
+- `master_data.csv` – Source Excel file with batch and SPOC data
 - `requirements.txt` – Python package requirements
 
 ---
@@ -39,16 +39,12 @@ streamlit run bys_dashboard.py
 
 ## 🛠️ Sample Users
 
-| Username | Password   |
-|----------|------------|
-| user    | password   |
-| user2    | password2  |
-
+| Username | Password   | <Not provided for security>
 ---
 
 ## ☁️ Deploy on Streamlit Cloud
 
-1. Upload all files (`bys_dashboard.py`, `Master Data for App_updated.csv.xlsx`, `requirements.txt`, `README.md`) to a **public GitHub repository**
+1. Upload all files (`bys_dashboard.py`, `master_data.csv`, `requirements.txt`, `README.md`) to a **public GitHub repository**
 2. Go to [https://streamlit.io/cloud](https://streamlit.io/cloud)
 3. Sign in with GitHub and deploy the app using `bys_dashboard.py` as the entry file
 
@@ -60,6 +56,7 @@ streamlit run bys_dashboard.py
 streamlit
 pandas
 openpyxl
+hashlib
 ```
 
 ---
