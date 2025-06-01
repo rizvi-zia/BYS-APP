@@ -41,18 +41,16 @@ else:
 
     # ------------------------ DATA LOADING ------------------------ #
     df = None
-    st.info("Trying to load data from Google Drive...")
     try:
         file_id = "10eQneyaEyzXa1qfCotYFAH5O76Cew0-q"
         gsheet_url = f"https://drive.google.com/uc?export=download&id={file_id}"
         df = pd.read_csv(gsheet_url)
-        st.success("Loaded data from Google Drive.")
     except Exception as e:
-        st.warning("Failed to load from Google Drive. Please upload the Excel file below.")
+        st.warning("Google Drive load failed. Please upload the Excel file.")
         uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
         if uploaded_file:
             df = pd.read_excel(uploaded_file)
-            st.success("Loaded data from uploaded Excel file.")
+            st.success("Loaded data from uploaded file.")
         else:
             st.stop()
 
