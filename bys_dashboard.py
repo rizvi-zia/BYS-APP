@@ -71,11 +71,15 @@ else:
     # 📁 Project Dashboard
     if selected_tab == "📁 Project Dashboard":
         st.title("📁 Project Dashboard")
-        spoc_filter = st.selectbox("Select SPOC", ["All"] + sorted(df["SPOC"].dropna().unique().tolist()))
-        project_filter = st.selectbox("Select Project", ["All"] + sorted(df["Project Name"].dropna().unique().tolist()))
-        batch_type_filter = st.selectbox("Select Batch Type", ["All"] + sorted(df["Batch Type"].dropna().unique().tolist()))
-        date_range = st.date_input("Select Date Range", [])
 
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            spoc_filter = st.selectbox("Select SPOC", ["All"] + sorted(df["SPOC"].dropna().unique().tolist()))
+        with col2:
+            project_filter = st.selectbox("Select Project", ["All"] + sorted(df["Project Name"].dropna().unique().tolist()))
+        with col3:
+            batch_type_filter = st.selectbox("Select Batch Type", ["All"] + sorted(df["Batch Type"].dropna().unique().tolist()))
+        date_range = st.date_input("Select Date Range", [])
         filtered_df = df.copy()
         if spoc_filter != "All":
             filtered_df = filtered_df[filtered_df["SPOC"] == spoc_filter]
@@ -90,13 +94,20 @@ else:
                 (filtered_df["Batch End Date"] <= pd.to_datetime(end_date))
             ]
 
-        st.metric("Total Students", int(filtered_df["Total Students"].sum()))
-        st.metric("Trained Candidates", int(filtered_df["Trained Candidates"].sum()))
-        st.metric("Dropouts", int(filtered_df["Dropout"].sum()))
-        st.metric("Assessed", int(filtered_df["Assessed"].sum()))
-        st.metric("Certified", int(filtered_df["Certified"].sum()))
-        st.metric("Placed", int(filtered_df["Placed"].sum()))
-        st.metric("Fail", int(filtered_df["Fail"].sum()))
+        col_metrics1, col_metrics2, col_metrics3 = st.columns(3)
+        with col_metrics1:
+            st.metric("Total Students", int(filtered_df["Total Students"].sum()))
+            st.metric("Assessed", int(filtered_df["Assessed"].sum()))
+            st.metric("Placed", int(filtered_df["Placed"].sum()))
+
+        with col_metrics2:
+            st.metric("Trained Candidates", int(filtered_df["Trained Candidates"].sum()))
+            st.metric("Certified", int(filtered_df["Certified"].sum()))
+
+        with col_metrics3:
+            st.metric("Dropouts", int(filtered_df["Dropout"].sum()))
+            st.metric("Fail", int(filtered_df["Fail"].sum()))
+
 
         st.subheader("Training Centers")
         st.write(filtered_df["Training Center"].dropna().unique())
