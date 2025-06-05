@@ -145,6 +145,7 @@ else:
         st.subheader("Training Centers")
         st.write(filtered_df["Training Center"].dropna().unique())
     # 💰 SPOC Payout
+    # 💰 SPOC Payout
     elif selected_tab == "💰 SPOC Payout":
         st.title("💰 SPOC Payout")
         payout_df = df.copy()
@@ -172,6 +173,7 @@ else:
         st.metric("Total Payout Amount (₹)", int(payout_summary["Payout Amount"].sum()))
         st.metric("Total Payment Done (₹)", int(payout_summary["Payment Amount"].sum()))
         st.metric("Total Remaining Amount (₹)", int(payout_summary["Remaining Amount"].sum()))
-        
+
         st.subheader("Training Centers")
-        st.write(filtered_df["Training Center"].dropna().unique())
+        st.write(payout_df["Training Center"].dropna().unique())
+
