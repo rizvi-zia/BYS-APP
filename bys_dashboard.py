@@ -94,20 +94,16 @@ else:
                 (filtered_df["Batch End Date"] <= pd.to_datetime(end_date))
             ]
 
-        col_metrics1, col_metrics2, col_metrics3 = st.columns(3)
+        # ✅ Updated metrics section
+        col_metrics1, col_metrics2 = st.columns(2)
         with col_metrics1:
-            st.metric("Total Students", int(filtered_df["Total Students"].sum()))
+            st.metric("In Training", int(filtered_df["Total Students"].sum()))
             st.metric("Assessed", int(filtered_df["Assessed"].sum()))
             st.metric("Placed", int(filtered_df["Placed"].sum()))
 
         with col_metrics2:
             st.metric("Trained Candidates", int(filtered_df["Trained Candidates"].sum()))
             st.metric("Certified", int(filtered_df["Certified"].sum()))
-
-        with col_metrics3:
-            st.metric("Dropouts", int(filtered_df["Dropout"].sum()))
-            st.metric("Fail", int(filtered_df["Fail"].sum()))
-
 
         st.subheader("Training Centers")
         st.write(filtered_df["Training Center"].dropna().unique())
