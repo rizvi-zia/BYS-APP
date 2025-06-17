@@ -57,7 +57,7 @@ else:
             st.stop()
 
     # Convert date columns
-    date_cols = ["Batch Start Date", "Batch End Date", "Assessment Date"]
+    date_cols = ["Batch Start Date", "Batch End Date", "Payment Date", "Assessment Date"]
     for col in date_cols:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col], errors="coerce")
