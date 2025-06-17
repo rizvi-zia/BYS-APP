@@ -188,7 +188,7 @@ if "Payment Date" in payout_df.columns:
 else:
     st.info("ℹ️ No 'Payment Date' column found. Please include it in your dataset to show detailed history.")
 
-        st.dataframe(payout_summary)
+    st.dataframe(payout_summary)
     
         col1, col2, col3, col4 = st.columns(4)
         with col1:
