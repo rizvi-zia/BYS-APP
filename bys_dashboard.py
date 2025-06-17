@@ -177,6 +177,17 @@ else:
         payout_summary["Remaining Amount"] = payout_summary["Payout Amount"] - payout_summary["Payment Amount"]
     
         st.subheader("SPOC-wise Payout Summary")
+
+st.subheader("💸 Detailed Payment History by SPOC")
+# Check if Payment Date exists
+if "Payment Date" in payout_df.columns:
+    payout_df["Payment Date"] = pd.to_datetime(payout_df["Payment Date"], errors="coerce")
+    spoc_payment_history = payout_df[["SPOC", "Payment Amount", "Payment Date"]].dropna()
+    st.dataframe(spoc_payment_history.sort_values(by=["SPOC", "Payment Date"]))
+    st.download_button("⬇️ Download Payment History", spoc_payment_history.to_csv(index=False).encode(), file_name="spoc_payment_history.csv", mime="text/csv")
+else:
+    st.info("ℹ️ No 'Payment Date' column found. Please include it in your dataset to show detailed history.")
+
         st.dataframe(payout_summary)
     
         col1, col2, col3, col4 = st.columns(4)
