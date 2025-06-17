@@ -23,7 +23,7 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    st.title("🔒 Login")
+    st.title("\U0001F512 Login")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
@@ -34,39 +34,18 @@ if not st.session_state.logged_in:
             st.rerun()
         else:
             st.error("Invalid username or password")
+
 else:
     username = st.session_state.username
-    st.sidebar.title(f"👤 Welcome, {username}")
+    st.sidebar.title(f"\U0001F464 Welcome, {username}")
     log_action(username, "Accessed Dashboard")
 
     # ------------------------ DATA LOADING ------------------------ #
-df = None
-try:
-    file_id = "10eQneyaEyzXa1qfCotYFAH5O76Cew0-q"
-    gsheet_url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    df = pd.read_csv(gsheet_url)
-    df.columns = df.columns.str.strip().str.lower()
-    df.rename(columns={
-        "certified": "Certified",
-        "payment amount": "Payment Amount",
-        "payment date": "Payment Date",
-        "spoc": "SPOC",
-        "project name": "Project Name",
-        "batch type": "Batch Type",
-        "training center": "Training Center",
-        "batch status": "Batch Status",
-        "course": "Course",
-        "total students": "Total Students",
-        "placed": "Placed",
-        "assessed": "Assessed",
-        "trained candidates": "Trained Candidates"
-    }, inplace=True)
-
-except Exception as e:
-    st.warning("Google Drive load failed. Please upload the Excel file.")
-    uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
-    if uploaded_file:
-        df = pd.read_excel(uploaded_file)
+    df = None
+    try:
+        file_id = "10eQneyaEyzXa1qfCotYFAH5O76Cew0-q"
+        gsheet_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        df = pd.read_csv(gsheet_url)
         df.columns = df.columns.str.strip().str.lower()
         df.rename(columns={
             "certified": "Certified",
@@ -83,15 +62,35 @@ except Exception as e:
             "assessed": "Assessed",
             "trained candidates": "Trained Candidates"
         }, inplace=True)
-        st.success("Loaded data from uploaded file.")
-    else:
-        st.stop()
+    except Exception:
+        st.warning("Google Drive load failed. Please upload the Excel file.")
+        uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
+        if uploaded_file:
+            df = pd.read_excel(uploaded_file)
+            df.columns = df.columns.str.strip().str.lower()
+            df.rename(columns={
+                "certified": "Certified",
+                "payment amount": "Payment Amount",
+                "payment date": "Payment Date",
+                "spoc": "SPOC",
+                "project name": "Project Name",
+                "batch type": "Batch Type",
+                "training center": "Training Center",
+                "batch status": "Batch Status",
+                "course": "Course",
+                "total students": "Total Students",
+                "placed": "Placed",
+                "assessed": "Assessed",
+                "trained candidates": "Trained Candidates"
+            }, inplace=True)
+            st.success("Loaded data from uploaded file.")
+        else:
+            st.stop()
 
-# Convert date columns
-date_cols = ["Batch Start Date", "Batch End Date", "Assessment Date"]
-for col in date_cols:
-    if col in df.columns:
-        df[col] = pd.to_datetime(df[col], errors="coerce")
+    date_cols = ["Batch Start Date", "Batch End Date", "Assessment Date"]
+    for col in date_cols:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col], errors="coerce")
 
     # ------------------------ DASHBOARDS ------------------------ #
     tabs = ["📌 Active Batches Dashboard"]
