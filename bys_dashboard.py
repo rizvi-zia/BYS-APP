@@ -71,7 +71,6 @@ else:
     # 📁 Project Dashboard
     if selected_tab == "📁 Project Dashboard":
         st.title("📁 Project Dashboard")
-
         col1, col2, col3 = st.columns(3)
         with col1:
             spoc_filter = st.selectbox("Select SPOC", ["All"] + sorted(df["SPOC"].dropna().unique().tolist()))
@@ -94,13 +93,11 @@ else:
                 (filtered_df["Batch End Date"] <= pd.to_datetime(end_date))
             ]
 
-        # ✅ Updated metrics section
         col_metrics1, col_metrics2 = st.columns(2)
         with col_metrics1:
             st.metric("In Training", int(filtered_df["Total Students"].sum()))
             st.metric("Assessed", int(filtered_df["Assessed"].sum()))
             st.metric("Placed", int(filtered_df["Placed"].sum()))
-
         with col_metrics2:
             st.metric("Trained Candidates", int(filtered_df["Trained Candidates"].sum()))
             st.metric("Certified", int(filtered_df["Certified"].sum()))
@@ -108,7 +105,6 @@ else:
         st.subheader("Training Centers")
         st.write(filtered_df["Training Center"].dropna().unique())
 
-    # 📌 Active Batches Dashboard
     elif selected_tab == "📌 Active Batches Dashboard":
         st.title("📌 Active Batches Dashboard")
         active_df = df[df["Batch Status"] == "Active"]
@@ -141,15 +137,15 @@ else:
 
         st.subheader("Project-wise Breakdown")
         st.dataframe(filtered_df.groupby("Project Name")[["Total Students", "Certified", "Placed"]].sum().reset_index())
-       
+
         st.subheader("Training Centers")
         st.write(filtered_df["Training Center"].dropna().unique())
-    # 💰 SPOC Payout
+
     elif selected_tab == "💰 SPOC Payout":
         st.title("💰 SPOC Payout")
         payout_df = df.copy()
         payout_df["Payout Amount"] = payout_df["Certified"] * 4500
-    
+
         col1, col2, col3 = st.columns(3)
         with col1:
             selected_spoc = st.selectbox("Select SPOC", ["All"] + sorted(payout_df["SPOC"].dropna().unique().tolist()))
@@ -157,9 +153,9 @@ else:
             selected_project = st.selectbox("Select Project", ["All"] + sorted(payout_df["Project Name"].dropna().unique().tolist()))
         with col3:
             selected_batch_type = st.selectbox("Select Batch Type", ["All"] + sorted(payout_df["Batch Type"].dropna().unique().tolist()))
-    
+
         date_range = st.date_input("Select Batch Start-End Date Range", [])
-    
+
         if selected_spoc != "All":
             payout_df = payout_df[payout_df["SPOC"] == selected_spoc]
         if selected_project != "All":
@@ -172,24 +168,22 @@ else:
                 (payout_df["Batch Start Date"] >= pd.to_datetime(start_date)) &
                 (payout_df["Batch End Date"] <= pd.to_datetime(end_date))
             ]
-    
+
         payout_summary = payout_df.groupby("SPOC")[["Certified", "Payout Amount", "Payment Amount"]].sum().reset_index()
         payout_summary["Remaining Amount"] = payout_summary["Payout Amount"] - payout_summary["Payment Amount"]
-    
+
         st.subheader("SPOC-wise Payout Summary")
+        st.dataframe(payout_summary)
 
-st.subheader("💸 Detailed Payment History by SPOC")
-# Check if Payment Date exists
-if "Payment Date" in payout_df.columns:
-    payout_df["Payment Date"] = pd.to_datetime(payout_df["Payment Date"], errors="coerce")
-    spoc_payment_history = payout_df[["SPOC", "Payment Amount", "Payment Date"]].dropna()
-    st.dataframe(spoc_payment_history.sort_values(by=["SPOC", "Payment Date"]))
-    st.download_button("⬇️ Download Payment History", spoc_payment_history.to_csv(index=False).encode(), file_name="spoc_payment_history.csv", mime="text/csv")
-else:
-    st.info("ℹ️ No 'Payment Date' column found. Please include it in your dataset to show detailed history.")
+        st.subheader("💸 Detailed Payment History by SPOC")
+        if "Payment Date" in payout_df.columns:
+            payout_df["Payment Date"] = pd.to_datetime(payout_df["Payment Date"], errors="coerce")
+            spoc_payment_history = payout_df[["SPOC", "Payment Amount", "Payment Date"]].dropna()
+            st.dataframe(spoc_payment_history.sort_values(by=["SPOC", "Payment Date"]))
+            st.download_button("⬇️ Download Payment History", spoc_payment_history.to_csv(index=False).encode(), file_name="spoc_payment_history.csv", mime="text/csv")
+        else:
+            st.info("ℹ️ No 'Payment Date' column found. Please include it in your dataset to show detailed history.")
 
-    st.dataframe(payout_summary)
-    
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("Total Certified", int(payout_summary["Certified"].sum()))
@@ -199,5 +193,6 @@ else:
             st.metric("Total Payment Done (₹)", int(payout_summary["Payment Amount"].sum()))
         with col4:
             st.metric("Total Remaining Amount (₹)", int(payout_summary["Remaining Amount"].sum()))
-            st.write(payout_df["Training Center"].dropna().unique())
-    
+
+        st.subheader("Training Centers")
+        st.write(payout_df["Training Center"].dropna().unique())
