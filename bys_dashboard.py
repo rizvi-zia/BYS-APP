@@ -145,48 +145,48 @@ else:
         st.subheader("Training Centers")
         st.write(filtered_df["Training Center"].dropna().unique())
     # 💰 SPOC Payout
-elif selected_tab == "💰 SPOC Payout":
-    st.title("💰 SPOC Payout")
-    payout_df = df.copy()
-    payout_df["Payout Amount"] = payout_df["Certified"] * 4500
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        selected_spoc = st.selectbox("Select SPOC", ["All"] + sorted(payout_df["SPOC"].dropna().unique().tolist()))
-    with col2:
-        selected_project = st.selectbox("Select Project", ["All"] + sorted(payout_df["Project Name"].dropna().unique().tolist()))
-    with col3:
-        selected_batch_type = st.selectbox("Select Batch Type", ["All"] + sorted(payout_df["Batch Type"].dropna().unique().tolist()))
-
-    date_range = st.date_input("Select Batch Start-End Date Range", [])
-
-    if selected_spoc != "All":
-        payout_df = payout_df[payout_df["SPOC"] == selected_spoc]
-    if selected_project != "All":
-        payout_df = payout_df[payout_df["Project Name"] == selected_project]
-    if selected_batch_type != "All":
-        payout_df = payout_df[payout_df["Batch Type"] == selected_batch_type]
-    if len(date_range) == 2:
-        start_date, end_date = date_range
-        payout_df = payout_df[
-            (payout_df["Batch Start Date"] >= pd.to_datetime(start_date)) &
-            (payout_df["Batch End Date"] <= pd.to_datetime(end_date))
-        ]
-
-    payout_summary = payout_df.groupby("SPOC")[["Certified", "Payout Amount", "Payment Amount"]].sum().reset_index()
-    payout_summary["Remaining Amount"] = payout_summary["Payout Amount"] - payout_summary["Payment Amount"]
-
-    st.subheader("SPOC-wise Payout Summary")
-    st.dataframe(payout_summary)
-
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Total Certified", int(payout_summary["Certified"].sum()))
-    with col2:
-        st.metric("Total Payout Amount (₹)", int(payout_summary["Payout Amount"].sum()))
-    with col3:
-        st.metric("Total Payment Done (₹)", int(payout_summary["Payment Amount"].sum()))
-    with col4:
-        st.metric("Total Remaining Amount (₹)", int(payout_summary["Remaining Amount"].sum()))
-        st.write(payout_df["Training Center"].dropna().unique())
-
+    elif selected_tab == "💰 SPOC Payout":
+        st.title("💰 SPOC Payout")
+        payout_df = df.copy()
+        payout_df["Payout Amount"] = payout_df["Certified"] * 4500
+    
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            selected_spoc = st.selectbox("Select SPOC", ["All"] + sorted(payout_df["SPOC"].dropna().unique().tolist()))
+        with col2:
+            selected_project = st.selectbox("Select Project", ["All"] + sorted(payout_df["Project Name"].dropna().unique().tolist()))
+        with col3:
+            selected_batch_type = st.selectbox("Select Batch Type", ["All"] + sorted(payout_df["Batch Type"].dropna().unique().tolist()))
+    
+        date_range = st.date_input("Select Batch Start-End Date Range", [])
+    
+        if selected_spoc != "All":
+            payout_df = payout_df[payout_df["SPOC"] == selected_spoc]
+        if selected_project != "All":
+            payout_df = payout_df[payout_df["Project Name"] == selected_project]
+        if selected_batch_type != "All":
+            payout_df = payout_df[payout_df["Batch Type"] == selected_batch_type]
+        if len(date_range) == 2:
+            start_date, end_date = date_range
+            payout_df = payout_df[
+                (payout_df["Batch Start Date"] >= pd.to_datetime(start_date)) &
+                (payout_df["Batch End Date"] <= pd.to_datetime(end_date))
+            ]
+    
+        payout_summary = payout_df.groupby("SPOC")[["Certified", "Payout Amount", "Payment Amount"]].sum().reset_index()
+        payout_summary["Remaining Amount"] = payout_summary["Payout Amount"] - payout_summary["Payment Amount"]
+    
+        st.subheader("SPOC-wise Payout Summary")
+        st.dataframe(payout_summary)
+    
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Certified", int(payout_summary["Certified"].sum()))
+        with col2:
+            st.metric("Total Payout Amount (₹)", int(payout_summary["Payout Amount"].sum()))
+        with col3:
+            st.metric("Total Payment Done (₹)", int(payout_summary["Payment Amount"].sum()))
+        with col4:
+            st.metric("Total Remaining Amount (₹)", int(payout_summary["Remaining Amount"].sum()))
+            st.write(payout_df["Training Center"].dropna().unique())
+    
