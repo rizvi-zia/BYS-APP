@@ -8,6 +8,9 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def check_password(username, password):
+    if "users" not in st.secrets:
+        st.error("User credentials not configured in `.streamlit/secrets.toml`.")
+        st.stop()
     users = st.secrets["users"]
     return username in users and hash_password(password) == hash_password(users[username])
 
@@ -60,7 +63,10 @@ else:
             "total students": "Total Students",
             "placed": "Placed",
             "assessed": "Assessed",
-            "trained candidates": "Trained Candidates"
+            "trained candidates": "Trained Candidates",
+            "batch start date": "Batch Start Date",              # ✅ ADDED
+            "batch end date": "Batch End Date",                  # ✅ ADDED
+            "assessment date": "Assessment Date"                 # ✅ ADDED
         }, inplace=True)
     except Exception:
         st.warning("Google Drive load failed. Please upload the Excel file.")
@@ -81,11 +87,17 @@ else:
                 "total students": "Total Students",
                 "placed": "Placed",
                 "assessed": "Assessed",
-                "trained candidates": "Trained Candidates"
+                "trained candidates": "Trained Candidates",
+                "batch start date": "Batch Start Date",          # ✅ ADDED
+                "batch end date": "Batch End Date",              # ✅ ADDED
+                "assessment date": "Assessment Date"             # ✅ ADDED
             }, inplace=True)
             st.success("Loaded data from uploaded file.")
         else:
             st.stop()
+
+    # Optional: Check column names
+    # st.write("Columns available:", df.columns.tolist())
 
     date_cols = ["Batch Start Date", "Batch End Date", "Assessment Date"]
     for col in date_cols:
