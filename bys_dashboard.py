@@ -68,7 +68,7 @@ else:
 
     tabs = ["\ud83d\udccc Active Batches Dashboard"]
     if username == "admin":
-        tabs = ["\ud83d\udcc1 Project Dashboard", "\ud83d\udccc Active Batches Dashboard", "\ud83d\udcb0 SPOC Payout"]
+        tabs = ["Project Dashboard", "Active Batches Dashboard", "SPOC Payout"]
 
     selected_tab = st.sidebar.radio("Select a tab", tabs)
     log_action(username, f"Opened tab: {selected_tab}")
