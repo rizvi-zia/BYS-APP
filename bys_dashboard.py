@@ -26,9 +26,14 @@ if not st.session_state.logged_in:
     st.title("🔒 Login")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        if check_password(username, password):
-            st.session_state.logged_in = Trueimport streamlit as st
+if st.button("Login"):
+    if check_password(username, password):
+        st.session_state.logged_in = True
+        st.session_state.username = username
+        log_action(username, "Logged in")
+        st.rerun()
+    else:
+        st.error("Invalid username or password")
 import pandas as pd
 import hashlib
 from datetime import datetime
