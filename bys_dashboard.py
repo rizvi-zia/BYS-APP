@@ -12,7 +12,7 @@ def check_password(username, password):
         st.error("User credentials not configured in `.streamlit/secrets.toml`.")
         st.stop()
     users = st.secrets["users"]
-    return username in users and hash_password(password) == hash_password(users[username])
+    return username in users and hash_password(password) == users[username]
 
 def log_action(user, action):
     with open("user_activity_log.txt", "a", encoding="utf-8") as f:
@@ -64,9 +64,9 @@ else:
             "placed": "Placed",
             "assessed": "Assessed",
             "trained candidates": "Trained Candidates",
-            "batch start date": "Batch Start Date",              # ✅ ADDED
-            "batch end date": "Batch End Date",                  # ✅ ADDED
-            "assessment date": "Assessment Date"                 # ✅ ADDED
+            "batch start date": "Batch Start Date",
+            "batch end date": "Batch End Date",
+            "assessment date": "Assessment Date"
         }, inplace=True)
     except Exception:
         st.warning("Google Drive load failed. Please upload the Excel file.")
@@ -88,23 +88,19 @@ else:
                 "placed": "Placed",
                 "assessed": "Assessed",
                 "trained candidates": "Trained Candidates",
-                "batch start date": "Batch Start Date",          # ✅ ADDED
-                "batch end date": "Batch End Date",              # ✅ ADDED
-                "assessment date": "Assessment Date"             # ✅ ADDED
+                "batch start date": "Batch Start Date",
+                "batch end date": "Batch End Date",
+                "assessment date": "Assessment Date"
             }, inplace=True)
             st.success("Loaded data from uploaded file.")
         else:
             st.stop()
 
-    # Optional: Check column names
-    # st.write("Columns available:", df.columns.tolist())
-
-    date_cols = ["Batch Start Date", "Batch End Date", "Assessment Date"]
+    date_cols = ["Batch Start Date", "Batch End Date", "Assessment Date", "Payment Date"]
     for col in date_cols:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col], errors="coerce")
 
-    # ------------------------ DASHBOARDS ------------------------ #
     tabs = ["📌 Active Batches Dashboard"]
     if username == "admin":
         tabs = ["📁 Project Dashboard", "📌 Active Batches Dashboard", "💰 SPOC Payout"]
@@ -112,83 +108,7 @@ else:
     selected_tab = st.sidebar.radio("Select a tab", tabs)
     log_action(username, f"Opened tab: {selected_tab}")
 
-    # 📁 Project Dashboard
-    if selected_tab == "📁 Project Dashboard":
-        st.title("📁 Project Dashboard")
-
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            spoc_filter = st.selectbox("Select SPOC", ["All"] + sorted(df["SPOC"].dropna().unique().tolist()))
-        with col2:
-            project_filter = st.selectbox("Select Project", ["All"] + sorted(df["Project Name"].dropna().unique().tolist()))
-        with col3:
-            batch_type_filter = st.selectbox("Select Batch Type", ["All"] + sorted(df["Batch Type"].dropna().unique().tolist()))
-        date_range = st.date_input("Select Date Range", [])
-        filtered_df = df.copy()
-        if spoc_filter != "All":
-            filtered_df = filtered_df[filtered_df["SPOC"] == spoc_filter]
-        if project_filter != "All":
-            filtered_df = filtered_df[filtered_df["Project Name"] == project_filter]
-        if batch_type_filter != "All":
-            filtered_df = filtered_df[filtered_df["Batch Type"] == batch_type_filter]
-        if len(date_range) == 2:
-            start_date, end_date = date_range
-            filtered_df = filtered_df[
-                (filtered_df["Batch Start Date"] >= pd.to_datetime(start_date)) &
-                (filtered_df["Batch End Date"] <= pd.to_datetime(end_date))
-            ]
-
-        col_metrics1, col_metrics2 = st.columns(2)
-        with col_metrics1:
-            st.metric("In Training", int(filtered_df["Total Students"].sum()))
-            st.metric("Assessed", int(filtered_df["Assessed"].sum()))
-            st.metric("Placed", int(filtered_df["Placed"].sum()))
-        with col_metrics2:
-            st.metric("Trained Candidates", int(filtered_df["Trained Candidates"].sum()))
-            st.metric("Certified", int(filtered_df["Certified"].sum()))
-
-        st.subheader("Training Centers")
-        st.write(filtered_df["Training Center"].dropna().unique())
-
-    # 📌 Active Batches Dashboard
-    elif selected_tab == "📌 Active Batches Dashboard":
-        st.title("📌 Active Batches Dashboard")
-        active_df = df[df["Batch Status"] == "Active"]
-
-        spoc_filter = st.selectbox("Select SPOC", ["All"] + sorted(active_df["SPOC"].dropna().unique().tolist()))
-        project_filter = st.selectbox("Select Project", ["All"] + sorted(active_df["Project Name"].dropna().unique().tolist()))
-        batch_type_filter = st.selectbox("Select Batch Type", ["All"] + sorted(active_df["Batch Type"].dropna().unique().tolist()))
-        course_filter = st.selectbox("Select Course", ["All"] + sorted(active_df["Course"].dropna().unique().tolist()))
-        date_range = st.date_input("Select Batch Start-End Date Range", [])
-
-        filtered_df = active_df.copy()
-        if spoc_filter != "All":
-            filtered_df = filtered_df[filtered_df["SPOC"] == spoc_filter]
-        if project_filter != "All":
-            filtered_df = filtered_df[filtered_df["Project Name"] == project_filter]
-        if batch_type_filter != "All":
-            filtered_df = filtered_df[filtered_df["Batch Type"] == batch_type_filter]
-        if course_filter != "All":
-            filtered_df = filtered_df[filtered_df["Course"] == course_filter]
-        if len(date_range) == 2:
-            start_date, end_date = date_range
-            filtered_df = filtered_df[
-                (filtered_df["Batch Start Date"] >= pd.to_datetime(start_date)) &
-                (filtered_df["Batch End Date"] <= pd.to_datetime(end_date))
-            ]
-
-        st.metric("Active Batches", len(filtered_df))
-        st.subheader("SPOC-wise Active Batch Summary")
-        st.dataframe(filtered_df.groupby("SPOC")[["Total Students", "Certified", "Placed"]].sum().reset_index())
-
-        st.subheader("Project-wise Breakdown")
-        st.dataframe(filtered_df.groupby("Project Name")[["Total Students", "Certified", "Placed"]].sum().reset_index())
-
-        st.subheader("Training Centers")
-        st.write(filtered_df["Training Center"].dropna().unique())
-
-    # 💰 SPOC Payout
-    elif selected_tab == "💰 SPOC Payout":
+    if selected_tab == "💰 SPOC Payout":
         st.title("💰 SPOC Payout")
         payout_df = df.copy()
         payout_df["Payout Amount"] = payout_df["Certified"] * 4500
@@ -216,29 +136,43 @@ else:
                 (payout_df["Batch End Date"] <= pd.to_datetime(end_date))
             ]
 
-        payout_summary = payout_df.groupby("SPOC")[["Certified", "Payout Amount", "Payment Amount"]].sum().reset_index()
-        payout_summary["Remaining Amount"] = payout_summary["Payout Amount"] - payout_summary["Payment Amount"]
+        if "Payment Amount" in payout_df.columns:
+            missing_payment_dates = payout_df[(payout_df["Payment Amount"] > 0) & (payout_df["Payment Date"].isna())]
+            if not missing_payment_dates.empty:
+                st.warning("⚠️ Some rows have payment done but missing 'Payment Date'. Please correct the data.")
+                st.dataframe(missing_payment_dates)
 
-        st.subheader("SPOC-wise Payout Summary")
-        st.dataframe(payout_summary)
+        spoc_summary = payout_df.groupby("SPOC")[["Certified", "Payout Amount", "Payment Amount"]].sum().reset_index()
+        spoc_summary.rename(columns={"Payment Amount": "Paid"}, inplace=True)
+        spoc_summary["Balance"] = spoc_summary["Payout Amount"] - spoc_summary["Paid"]
+
+        st.subheader("🧾 SPOC-wise Payout Summary")
+        st.dataframe(spoc_summary)
+
+        project_summary = payout_df.groupby("Project Name")[["Certified", "Payout Amount", "Payment Amount"]].sum().reset_index()
+        project_summary.rename(columns={"Payment Amount": "Paid"}, inplace=True)
+        project_summary["Balance"] = project_summary["Payout Amount"] - project_summary["Paid"]
+
+        st.subheader("🏷️ Project-wise Payout Summary")
+        st.dataframe(project_summary)
 
         st.subheader("💸 Detailed Payment History by SPOC")
         if "Payment Date" in payout_df.columns:
             payout_df["Payment Date"] = pd.to_datetime(payout_df["Payment Date"], errors="coerce")
-            spoc_payment_history = payout_df[["SPOC", "Payment Amount", "Payment Date"]].dropna()
-            st.dataframe(spoc_payment_history.sort_values(by=["SPOC", "Payment Date"]))
-            st.download_button("⬇️ Download Payment History", spoc_payment_history.to_csv(index=False).encode(), file_name="spoc_payment_history.csv", mime="text/csv")
+            history_df = payout_df[payout_df["Payment Amount"] > 0][["SPOC", "Project Name", "Payment Amount", "Payment Date"]].dropna()
+            st.dataframe(history_df.sort_values(by=["SPOC", "Payment Date"]))
+            st.download_button("⬇️ Download Payment History", history_df.to_csv(index=False).encode(), file_name="spoc_payment_history.csv", mime="text/csv")
         else:
             st.info("ℹ️ No 'Payment Date' column found. Please include it in your dataset to show detailed history.")
 
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Total Certified", int(payout_summary["Certified"].sum()))
+            st.metric("Total Certified", int(spoc_summary["Certified"].sum()))
         with col2:
-            st.metric("Total Payout Amount (₹)", int(payout_summary["Payout Amount"].sum()))
+            st.metric("Total Payout Amount (₹)", int(spoc_summary["Payout Amount"].sum()))
         with col3:
-            st.metric("Total Payment Done (₹)", int(payout_summary["Payment Amount"].sum()))
+            st.metric("Total Paid (₹)", int(spoc_summary["Paid"].sum()))
         with col4:
-            st.metric("Total Remaining Amount (₹)", int(payout_summary["Remaining Amount"].sum()))
+            st.metric("Total Balance (₹)", int(spoc_summary["Balance"].sum()))
 
-        st.write(payout_df["Training Center"].dropna().unique())
+        st.write("Training Centers:", payout_df["Training Center"].dropna().unique())
